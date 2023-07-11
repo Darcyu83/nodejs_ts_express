@@ -5,7 +5,7 @@ import {
   InferCreationAttributes,
   Model,
 } from "sequelize";
-import { sequelize } from "..";
+import { sequelizeDAO } from "..";
 
 class Vendor extends Model<
   InferAttributes<Vendor>,
@@ -13,7 +13,13 @@ class Vendor extends Model<
 > {
   declare id: CreationOptional<number>;
   declare name: string;
-  declare employee_num: number;
+  declare employeeNum: number;
+  declare lat: number;
+  declare lon: number;
+  // declare createdAt: CreationOptional<Date>;
+  // declare updatedAt: CreationOptional<Date>;
+  // declare created_at: CreationOptional<Date>;
+  // declare updated_at: CreationOptional<Date>;
 }
 
 Vendor.init(
@@ -21,19 +27,37 @@ Vendor.init(
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
-      unique: true,
+      primaryKey: true,
     },
     name: {
       type: DataTypes.STRING,
+      allowNull: false,
     },
-    employee_num: { type: DataTypes.INTEGER },
+    employeeNum: {
+      type: DataTypes.INTEGER,
+      field: "employee_num",
+      allowNull: true,
+    },
+    lat: DataTypes.FLOAT,
+    lon: DataTypes.FLOAT,
+
+    // created_at: {
+    //   type: DataTypes.DATE,
+    //   allowNull: false,
+    //   defaultValue: DataTypes.NOW,
+    // },
+    // updated_at: {
+    //   type: DataTypes.DATE,
+    //   allowNull: true,
+    // },
   },
   {
-    sequelize,
+    sequelize: sequelizeDAO,
     timestamps: true,
     paranoid: true,
     modelName: "Vendor",
     tableName: "vendors",
+    underscored: true,
   }
 );
 
