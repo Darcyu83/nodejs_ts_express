@@ -6,10 +6,10 @@ import {
   InferAttributes,
   InferCreationAttributes,
   Model,
+  Sequelize,
 } from "sequelize";
 import { sequelizeDAO } from "..";
-import Vendor from "./vendor";
-import Department from "./department";
+
 import { Hash } from "crypto";
 
 class Employee extends Model<
@@ -23,63 +23,70 @@ class Employee extends Model<
   declare birth: string;
   declare age: number;
   declare workYears: number;
-  declare dept: ForeignKey<Department["id"]>;
+  declare dept: number;
 }
 
-Employee.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      allowNull: false,
-      primaryKey: true,
-    },
-    loginId: {
-      type: DataTypes.STRING,
-      field: "login_id",
-      allowNull: false,
-      comment: "로그인 아이디",
-    },
-    pwd: {
-      type: DataTypes.STRING,
-      set(value) {
-        this.setDataValue("pwd", this.name + value); //해쉬 처리할 곳
+const initialize = (sequelizeDAO: Sequelize) => {
+  Employee.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+
+        primaryKey: true,
       },
-      allowNull: false,
-      comment: "비밀번호",
+      loginId: {
+        type: DataTypes.STRING,
+        field: "login_id",
+        allowNull: false,
+        comment: "로그인 아이디",
+      },
+      pwd: {
+        type: DataTypes.STRING,
+        set(value) {
+          this.setDataValue("pwd", this.name + value); //해쉬 처리할 곳
+        },
+        allowNull: false,
+        comment: "비밀번호",
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        comment: "직원 이름",
+      },
+      birth: {
+        type: DataTypes.STRING(8),
+        allowNull: false,
+        comment: "생년월일 : 20000409",
+      },
+      age: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      workYears: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        // field: "work_years",
+      },
+      dept: { type: DataTypes.STRING },
     },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      comment: "직원 이름",
-    },
-    birth: {
-      type: DataTypes.STRING(8),
-      allowNull: false,
-      comment: "생년월일 : 20000409",
-    },
-    age: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    workYears: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0,
-      field: "work_years",
-    },
-    dept: { type: DataTypes.STRING },
-  },
-  {
-    sequelize: sequelizeDAO,
-    timestamps: true,
-    paranoid: true,
-    tableName: "employees",
-    modelName: "Employee",
-    // underscored: true,
-  }
-);
+    {
+      sequelize: sequelizeDAO,
+      timestamps: true,
+      paranoid: true,
+      tableName: "employee",
+      modelName: "Employee",
+      // underscored: true,
+    }
+  );
+  //associate(sequelizeDAO.models);
+};
 
-Employee.belongsTo(Vendor);
+const associate = (models: Sequelize["models"]) => {
+  console.log("Employee associate models === ", models);
+  Employee.belongsTo(models.Vendor, { targetKey: "id" });
+};
 
+module.exports = { initialize, associate };
 export default Employee;

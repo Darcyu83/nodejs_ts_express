@@ -5,32 +5,38 @@ import {
   InferAttributes,
   InferCreationAttributes,
   Model,
+  Sequelize,
 } from "sequelize";
-
-import Employee from "./employee";
-import { sequelizeDAO } from "..";
 
 class Mail extends Model<InferAttributes<Mail>, InferCreationAttributes<Mail>> {
   declare id: CreationOptional<number>;
-  declare title: string;
-  declare content: string;
+  declare email: string;
 }
 
-Mail.init(
-  {
-    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    title: { type: DataTypes.STRING },
-    content: { type: DataTypes.TEXT },
-  },
-  {
-    sequelize: sequelizeDAO,
-    timestamps: true,
-    paranoid: true,
-    underscored: true,
-  }
-);
+const initialize = (sequelizeDAO: Sequelize) => {
+  Mail.init(
+    {
+      id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+      email: { type: DataTypes.STRING },
+    },
+    {
+      sequelize: sequelizeDAO,
+      timestamps: true,
+      paranoid: true,
+      underscored: true,
+      modelName: "Mail",
+      tableName: "mail",
+    }
+  );
+  //associate(sequelizeDAO.models);
+};
 
-Mail.belongsTo(Employee, { as: "sender" });
-Mail.belongsTo(Employee, { as: "receiver" });
+const associate = (models: Sequelize["models"]) => {
+  console.log("Mail associate models === ", models);
+  // Mail.belongsTo(models.Person);
+  // Mail.belongsTo(Person, { as: "sender" });
+  Mail.belongsTo(models.Person, { as: "receiver" });
+};
 
+module.exports = { initialize, associate };
 export default Mail;

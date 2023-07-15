@@ -1,30 +1,19 @@
 import express, { ErrorRequestHandler } from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
-import { sequelizeDAO } from "./db";
+import { sequelizeDAO, syncSeqeulize } from "./db";
 import indexRouter from "./api/routes";
 import vendorRouter from "./api/routes/vendor";
 
 dotenv.config();
 const app = express();
 
+syncSeqeulize();
+
 app.set("port", process.env.PORT || 4014);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
-
-sequelizeDAO.query("SET FOREIGN_KEY_CHECKS = 0").then(() => {
-  sequelizeDAO
-    .sync({
-      // force: true,
-      alter: true,
-    })
-    .then((e) => {
-      console.log("시퀄라이즈 싱크 === 성공", e.models);
-      sequelizeDAO.query("SET FOREIGN_KEY_CHECKS = 1");
-    })
-    .catch((err) => console.log("시퀄라이즈 싱크 === 오류 ", err));
-});
 
 app.use("/vendor", vendorRouter);
 app.use("/", indexRouter);
