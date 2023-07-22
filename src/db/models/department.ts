@@ -6,28 +6,28 @@ import {
   InferAttributes,
   InferCreationAttributes,
   Model,
+  ModelStatic,
   Sequelize,
 } from "sequelize";
-import { sequelizeDAO } from "..";
 
-class Department extends Model<
-  InferAttributes<Department>,
-  InferCreationAttributes<Department>
+class DepartmentModel extends Model<
+  InferAttributes<DepartmentModel>,
+  InferCreationAttributes<DepartmentModel>
 > {
   declare id: CreationOptional<number>;
   declare name: string;
-  declare affiliation: ForeignKey<Department["id"]>;
+  declare affiliation: ForeignKey<DepartmentModel["id"]>;
 }
 
-const initialize = (sequelizeDAO: Sequelize) => {
-  Department.init(
+export const initialize = (sequelizeDAO: Sequelize) => {
+  return DepartmentModel.init(
     {
       id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       name: { type: DataTypes.STRING, allowNull: false },
       affiliation: {
         type: DataTypes.INTEGER,
         references: {
-          model: Department,
+          model: DepartmentModel,
           key: "id",
         },
       },
@@ -38,15 +38,14 @@ const initialize = (sequelizeDAO: Sequelize) => {
       paranoid: true,
       underscored: true,
       tableName: "department",
-      modelName: "Department",
+      modelName: "DepartmentModel",
     }
   );
   //associate(sequelizeDAO.models);
 };
 
-const associate = (models: Sequelize["models"]) => {
-  console.log("Department associate models === ", models);
+export const associate = (models: Sequelize["models"]) => {
+  console.log("DepartmentModel associate models === ", models);
 };
 
-module.exports = { initialize, associate };
-export default Department;
+export default DepartmentModel;

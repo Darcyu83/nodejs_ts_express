@@ -12,9 +12,9 @@ import { sequelizeDAO } from "..";
 
 import { Hash } from "crypto";
 
-class Employee extends Model<
-  InferAttributes<Employee>,
-  InferCreationAttributes<Employee>
+class EmployeeModel extends Model<
+  InferAttributes<EmployeeModel>,
+  InferCreationAttributes<EmployeeModel>
 > {
   declare id: CreationOptional<number>;
   declare loginId: string;
@@ -26,8 +26,8 @@ class Employee extends Model<
   declare dept: number;
 }
 
-const initialize = (sequelizeDAO: Sequelize) => {
-  Employee.init(
+export const initialize = (sequelizeDAO: Sequelize) => {
+  return EmployeeModel.init(
     {
       id: {
         type: DataTypes.INTEGER,
@@ -76,17 +76,16 @@ const initialize = (sequelizeDAO: Sequelize) => {
       timestamps: true,
       paranoid: true,
       tableName: "employee",
-      modelName: "Employee",
+      modelName: "EmployeeModel",
       // underscored: true,
     }
   );
   //associate(sequelizeDAO.models);
 };
 
-const associate = (models: Sequelize["models"]) => {
-  console.log("Employee associate models === ", models);
-  Employee.belongsTo(models.Vendor, { targetKey: "id" });
+export const associate = (models: Sequelize["models"]) => {
+  console.log("EmployeeModel associate models === ", models);
+  EmployeeModel.belongsTo(models.VendorModel, { targetKey: "id" });
 };
 
-module.exports = { initialize, associate };
-export default Employee;
+export default EmployeeModel;

@@ -1,10 +1,17 @@
 import { RequestHandler } from "express";
-import Models, { sequelizeDAO } from "../../db";
+
+import VendorServices from "../services/vendor";
+import { TupleType } from "typescript";
+
+const a = { DEV: "", PRD: "" };
 
 export const getVendorList: RequestHandler = async (req, res, next) => {
-  const result = await sequelizeDAO.models.Vendor.findAndCountAll({
-    limit: 10,
-  });
+  try {
+    const result = await VendorServices.getVendorList();
 
-  res.status(200).json({ code: 200, data: result.rows, total: result.count });
+    res.status(200).json({ code: 200, data: result.rows, total: result.count });
+  } catch (error) {
+    console.log("getVendorList ==== ", error);
+    next(error);
+  }
 };

@@ -26,6 +26,11 @@ app.use((req, res, next) => {
 
 const errorMiddleware: ErrorRequestHandler = (error, req, res, next) => {
   console.log();
+
+  const err = new Error(error.messgae);
+  err.status = error.status;
+
+  res.status(500).json({ code: 500, message: err.message });
 };
 app.use(errorMiddleware);
 

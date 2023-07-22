@@ -1,17 +1,7 @@
-import {
-  Attributes,
-  DataTypes,
-  Dialect,
-  Model,
-  ModelCtor,
-  ModelDefined,
-  ModelStatic,
-  Sequelize,
-} from "sequelize";
+import { Dialect, Sequelize } from "sequelize";
 import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
-
 dotenv.config();
 
 export const sequelizeDAO = new Sequelize({
@@ -23,28 +13,26 @@ export const sequelizeDAO = new Sequelize({
   logging: console.log,
 });
 
+const db: { [key: string]: any } = {};
+
 // 모델 init
 const folderPath = path.join(__dirname, "models");
-fs.readdirSync(folderPath).forEach((filename) => {
-  console.log("fs.readFile ::", path.join(folderPath, filename));
+fs.readdirSync(folderPath).forEach(async (filename) => {
   // 모델 파일 import 하면서 init association 처리
-  const model = require(path.join(folderPath, filename));
+  const { initialize } = await import(path.join(folderPath, filename));
+  const instance = initialize(sequelizeDAO);
 
-  console.log("fs.readFile ::", model);
-  model.initialize(sequelizeDAO);
+  db[instance.name] = instance;
 });
 
 // 모델 관계 Associated
-fs.readdirSync(folderPath).forEach((filename) => {
+fs.readdirSync(folderPath).forEach(async (filename) => {
   console.log("fs.readFile ::", path.join(folderPath, filename));
   // 모델 파일 import 하면서 init association 처리
-  const model = require(path.join(folderPath, filename));
-  model.associate(sequelizeDAO.models);
-});
+  const { associate } = await import(path.join(folderPath, filename));
 
-export let Models: {
-  [key: string]: ModelStatic<Model>;
-} = {};
+  associate(sequelizeDAO.models);
+});
 
 export const syncSeqeulize = () =>
   sequelizeDAO.query("SET FOREIGN_KEY_CHECKS = 0").then(() => {
@@ -54,21 +42,10 @@ export const syncSeqeulize = () =>
         alter: true,
       })
       .then((e) => {
-        console.log("시퀄라이즈 싱크 === 성공", e.models);
-        Models = { ...e.models };
-        Object.keys(e.models).map((key) => {
-          const modelNm = e.models[key].name;
-          const model = e.models[key];
-          console.log(
-            e.models[key].name,
-            "associations ==== ",
-            e.models[key].associations
-          );
-        });
-
-        console.log("시퀄라이즈 싱크 === 성공 ===  Models", Models.Vendor);
+        console.log("keys ===== ", db);
         sequelizeDAO.query("SET FOREIGN_KEY_CHECKS = 1");
       })
       .catch((err) => console.log("시퀄라이즈 싱크 === 오류 ", err));
   });
-export default sequelizeDAO;
+
+export default db;

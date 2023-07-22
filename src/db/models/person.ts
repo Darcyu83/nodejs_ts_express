@@ -8,9 +8,9 @@ import {
   Sequelize,
 } from "sequelize";
 
-class Person extends Model<
-  InferAttributes<Person>,
-  InferCreationAttributes<Person>
+class PersonModel extends Model<
+  InferAttributes<PersonModel>,
+  InferCreationAttributes<PersonModel>
 > {
   id?: string;
   firstname!: string;
@@ -27,8 +27,8 @@ class Person extends Model<
   }
 }
 
-const initialize = (sequelizeDAO: Sequelize) => {
-  Person.init(
+export const initialize = (sequelizeDAO: Sequelize) => {
+  return PersonModel.init(
     {
       id: {
         type: DataTypes.INTEGER,
@@ -41,18 +41,17 @@ const initialize = (sequelizeDAO: Sequelize) => {
     {
       sequelize: sequelizeDAO,
       underscored: true,
-      modelName: "Person",
+      modelName: "PersonModel",
       tableName: "person",
     }
   );
   //associate(sequelizeDAO.models);
 };
 
-const associate = (models: Sequelize["models"]) => {
-  console.log("Person associate models === ", models);
-  Person.hasMany(models.Mail, { foreignKey: "mail_sent" });
-  // Person.hasMany(Mail, { foreignKey: "mail_received" });
+export const associate = (models: Sequelize["models"]) => {
+  console.log("PersonModel associate models === ", models);
+  PersonModel.hasMany(models.MailModel, { foreignKey: "mail_sent" });
+  // PersonModel.hasMany(Mail, { foreignKey: "mail_received" });
 };
 
-module.exports = { initialize, associate };
-export default Person;
+export default PersonModel;

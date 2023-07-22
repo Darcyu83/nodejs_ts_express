@@ -5,25 +5,23 @@ import { CreationAttributes, ModelStatic, Sequelize } from "sequelize";
 import Models, { sequelizeDAO } from "../../db";
 import Vendor from "../../db/models/vendor";
 import Employee from "../../db/models/employee";
-
-const { Vendor: vendo, Employee: emp } = sequelizeDAO.models;
+import db from "../../db";
 
 export const createVendor: RequestHandler = async (req, res, next) => {
   // Sequelize.fn();
 
-  console.log("createVendor ----  ", sequelizeDAO.models.Vendor);
-  const vendorExisting = await vendo.findAll({
+  const vendorExisting = await db.VendorModel.findAll({
     where: {},
     // include: { model: Employee, attributes: [""] },
   });
-  const vendor = await vendo.create({
+  const vendor = await db.VendorModel.create({
     name: "A 주식회사",
     employeeNum: 100,
     lat: 32.91,
     lon: 128.91,
   });
 
-  const result = await emp.create({
+  const result = await db.EmployeeModel.create({
     age: 22,
     birth: "20231231",
     dept: 1,
@@ -42,7 +40,7 @@ export const createVendor: RequestHandler = async (req, res, next) => {
 
 export const getVendorsWithDetails: RequestHandler = async (req, res, next) => {
   try {
-    const result = await vendo.findAll({
+    const result = await db.VendorModel.findAll({
       include: { model: Employee },
     });
 

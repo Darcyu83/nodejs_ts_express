@@ -9,9 +9,9 @@ import {
   Sequelize,
 } from "sequelize";
 
-class Vendor extends Model<
-  InferAttributes<Vendor>,
-  InferCreationAttributes<Vendor>
+class VendorModel extends Model<
+  InferAttributes<VendorModel>,
+  InferCreationAttributes<VendorModel>
 > {
   declare id: CreationOptional<number>;
   declare name: string;
@@ -24,8 +24,8 @@ class Vendor extends Model<
   // declare updated_at: CreationOptional<Date>;
 }
 
-const initialize = (sequelizeDAO: Sequelize) => {
-  Vendor.init(
+export const initialize = (sequelizeDAO: Sequelize) => {
+  return VendorModel.init(
     {
       id: {
         type: DataTypes.INTEGER,
@@ -58,7 +58,7 @@ const initialize = (sequelizeDAO: Sequelize) => {
       sequelize: sequelizeDAO,
       timestamps: true,
       paranoid: true,
-      modelName: "Vendor",
+      modelName: "VendorModel",
       tableName: "vendors",
       underscored: true,
     }
@@ -67,11 +67,9 @@ const initialize = (sequelizeDAO: Sequelize) => {
   //associate(sequelizeDAO.models);
 };
 
-const associate = (models: Sequelize["models"]) => {
+export const associate = (models: Sequelize["models"]) => {
   console.log("Vendor associate models === ", models);
-  Vendor.hasMany(models.Employee);
+  VendorModel.hasMany(models.EmployeeModel);
 };
 
-module.exports = { initialize, associate };
-
-export default Vendor;
+export default VendorModel;
