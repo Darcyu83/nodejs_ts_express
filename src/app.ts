@@ -37,3 +37,5 @@ app.use(errorMiddleware);
 app.listen(app.get("port"), () => {
   console.log(app.get("port"), "포트 대기 중");
 });
+
+export default app;

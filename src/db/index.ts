@@ -13,7 +13,7 @@ export const sequelizeDAO = new Sequelize({
   logging: console.log,
 });
 
-const db: { [key: string]: any } = {};
+const models: { [key: string]: any } = {};
 
 // 모델 init
 const folderPath = path.join(__dirname, "models");
@@ -22,7 +22,7 @@ fs.readdirSync(folderPath).forEach(async (filename) => {
   const { initialize } = await import(path.join(folderPath, filename));
   const instance = initialize(sequelizeDAO);
 
-  db[instance.name] = instance;
+  models[instance.name] = instance;
 });
 
 // 모델 관계 Associated
@@ -42,10 +42,10 @@ export const syncSeqeulize = () =>
         alter: true,
       })
       .then((e) => {
-        console.log("keys ===== ", db);
+        console.log("keys ===== ", models);
         sequelizeDAO.query("SET FOREIGN_KEY_CHECKS = 1");
       })
       .catch((err) => console.log("시퀄라이즈 싱크 === 오류 ", err));
   });
 
-export default db;
+export default models;
